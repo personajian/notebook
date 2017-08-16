@@ -1,5 +1,10 @@
 [TOC]
 
+#### 参考文章
+
+1. [Java不能实现真正泛型的原因？](https://www.zhihu.com/question/28665443/answer/118148143)
+2. 《Effective Java》 第25条
+
 ### 一、Java不能实现真正泛型的原因？
 
 #### Java实现泛型与C++的区别
@@ -93,7 +98,4 @@ GJ / Java 5说：这个问题有点麻烦，赶不及在这个版本发布前完
 具体化/不可具体化：对于运行时来说。
  
 
-### 参考文章
 
-1. [Java不能实现真正泛型的原因？](https://www.zhihu.com/question/28665443/answer/118148143)
-2. 《Effective Java》 第25条

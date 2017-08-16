@@ -20,8 +20,8 @@
 11. [Java NIO编程实例之三Selector - 知乎专栏](https://zhuanlan.zhihu.com/p/26243285)
 12. [多种I/O模型及其对socket效率的改进](http://mickhan.blog.51cto.com/2517040/1586370)
 13. [谁能用通俗的语言解释一下什么是 RPC 框架？-知乎](https://www.zhihu.com/question/25536695/answer/36197244)
-13. []()
-13. []()
+13. [浅谈 Linux 中 Selector 的实现原理](http://www.jianshu.com/p/2b71ea919d49)
+13. [linux下epoll如何实现高效处理百万句柄的](http://blog.csdn.net/russell_tao/article/details/7160071)
 13. []()
 13. []()
 13. []()
@@ -249,3 +249,26 @@ NIO为我们提供了更好的解决方案，采用选择器（Selector）找出
 - write：写事件，对应值为SelectionKey.OP_WRITE(4)
 
 当SocketChannel有对应的事件发生时，Selector能够觉察到并进行相应的处理。
+
+#### epoll原理
+
+epoll是Linux下的一种IO多路复用技术，可以非常高效的处理数以百万计的socket句柄。
+
+使用c封装的3个epoll系统调用：
+
+1. int epoll_create(int size)
+epoll_create建立一个epoll对象。参数size是内核保证能够正确处理的最大句柄数，多于这个最大数时内核可不保证效果。
+2. int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+epoll_ctl可以操作epoll_create创建的epoll，如将socket句柄加入到epoll中让其监控，或把epoll正在监控的某个socket句柄移出epoll。
+3. int epoll_wait(int epfd, struct epoll_event *events,int maxevents, int timeout)
+epoll_wait在调用时，在给定的timeout时间内，所监控的句柄中有事件发生时，就返回用户态的进程。
+
+epoll的两种工作模式：
+
+1. LT：level-trigger，水平触发模式，只要某个socket处于readable/writable状态，无论什么时候进行epoll_wait都会返回该socket。
+2. ET：edge-trigger，边缘触发模式，只有某个socket从unreadable变为readable或从unwritable变为writable时，epoll_wait才会返回该socket。
+
+为了实现client和server的数据交互，Linux下采用管道pipe实现，windows下采用两个socket之间的通信进行实现，它们都有这样的特性：
+
+1. 都有两个端，一个是read端，一个是write端，windows中两个socket也是read和write的角色。
+2. 当往write端写入 数据，则read端即可以收到数据。
